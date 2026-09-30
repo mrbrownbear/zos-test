@@ -1,5 +1,5 @@
-import * as THREE from './vendor/three.module.js?v=20260930-r170-1';
-import {GLTFLoader} from './vendor/GLTFLoader.js?v=20260930-r170-1';
+import * as THREE from './vendor/three.module.js?v=20260930-rootfix-1';
+import {GLTFLoader} from './vendor/GLTFLoader.js?v=20260930-rootfix-1';
 
 const canvas=document.querySelector('#world'), renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:'high-performance'});
 renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.55;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
