@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {GLTFLoader} from './vendor/GLTFLoader.js';
 
 const canvas=document.querySelector('#world'), renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:'high-performance'});
 renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.55;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
@@ -24,7 +24,7 @@ function loadModel(key,name){return new Promise((resolve,reject)=>{const complet
 function setupOlives(){models.black=models.olives;models.green=models.olives.clone(true);scene.add(models.green);models.black.traverse(o=>{if(o.isMesh){o.material=o.material.clone();o.material.color.multiply(new THREE.Color('#5e5b51'))}});models.green.traverse(o=>{if(o.isMesh){o.material=o.material.clone();o.material.color.multiply(new THREE.Color('#b6c76b'))}})}
 function enter(){document.querySelector('#loading').classList.add('done')}
 const first=loadModel('mac',modelNames.mac).then(model=>{model.visible=true;ready=true;enter();return model}).catch(e=>{console.error('First bowl unavailable',e);loadLabel.textContent='The first bowl could not load. Open the console for the exact error.';enter()});
-first.finally(async()=>{for(const [k,n] of Object.entries(modelNames)){if(k==='mac')continue;try{await loadModel(k,n);if(k==='olives')setupOlives()}catch(e){console.error('Model unavailable',k,e)}}if(loaded===7){loadLabel.textContent='All 3D models ready';loadBar.style.transform='scaleX(1)'}});
+first.finally(()=>{const loadKeys=async keys=>{for(const k of keys){if(models[k])continue;try{await loadModel(k,modelNames[k]);if(k==='olives')setupOlives()}catch(e){console.error('Model unavailable',k,e)}}};const idle=window.requestIdleCallback||((fn)=>setTimeout(fn,900));idle(()=>loadKeys(['pasta','fork']),{timeout:2500});const loadAddons=()=>loadKeys(['olives','mushrooms','meat','cheese']);const addonSection=document.querySelector('#addons');if('IntersectionObserver'in window&&addonSection){const observer=new IntersectionObserver(entries=>{if(entries.some(entry=>entry.isIntersecting||entry.boundingClientRect.top<innerHeight*1.8)){observer.disconnect();loadAddons()}},{rootMargin:'120% 0px'});observer.observe(addonSection)}else{setTimeout(loadAddons,3500)}});
 document.querySelector('#skip-load').addEventListener('click',enter);
 const sections=[...document.querySelectorAll('.chapter')];function getScrollProgress(){const last=document.documentElement.scrollHeight-innerHeight;return last?clamp(scrollY/last):0}
 function setProgress(){progress=getScrollProgress();document.querySelector('#progress-bar').style.transform=`scaleX(${progress})`;const idx=Math.min(5,Math.floor(progress*6));document.body.dataset.chapter=sections[idx].id}
